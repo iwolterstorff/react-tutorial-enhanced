@@ -67,9 +67,13 @@ function MoveList(props) {
 		} catch(err) {
 			newMove = null;
 		}
-		const desc = newMove ?
+		let desc = newMove ?
 			newMove.player + ' at (' + newMove.x + ', ' + newMove.y + ')' :
 			'Go to game start';
+
+		if (thisMove.current) {
+			desc = <b>{desc}</b>
+		}
 
 		return (
 			<li key={thisMoveIndex}>
@@ -86,6 +90,7 @@ class Game extends React.Component {
 		this.state = {
 			history: [{
 				squares: Array(9).fill(null),
+				current: true,
 			}],
 			stepNumber: 0,
 			xIsNext: true,
@@ -120,19 +125,26 @@ class Game extends React.Component {
 			return;
 		}
 		squares[i] = this.state.xIsNext ? 'X' : 'O';
+		let newHistory = history.concat([{
+			squares: squares,
+			current: true,
+		}]);
+		newHistory[newHistory.length - 2].current = false;
 		this.setState({
-			history: history.concat([{
-				squares: squares,
-			}]),
+			history: newHistory,
 			stepNumber: history.length,
 			xIsNext: !this.state.xIsNext,
 		});
 	}
 
 	jumpTo(step) {
+		let newHistory = this.state.history;
+		newHistory[newHistory.length - 1].current = false;
+		newHistory[step].current = true;
 		this.setState({
 			stepNumber: step,
 			xIsNext: (step % 2) === 0,
+			history: newHistory
 		});
 	}
 }
