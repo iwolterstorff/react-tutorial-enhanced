@@ -15,32 +15,57 @@ function Board(props) {
 
 	function renderSquare(i) {
 		return (
-			<Square
-				value={props.squares[i]}
-				onClick={() => props.onClick(i)}
-			/>
+			<React.Fragment key={i}>
+				<Square
+					value={props.squares[i]}
+					onClick={() => props.onClick(i)}
+				/>
+			</React.Fragment>
 		);
+	}
+
+	// this seems too convoluted
+	let rows = new Array(3);
+	for (let x = 0; x < 3; x += 1) {
+		rows[x] = new Array(3);
+		for (let y = 0; y < 3; y += 1) {
+			rows[x][y] = renderSquare(x + y * 3);
+		}
 	}
 
 	return (
 		<div>
-			<div className="board-row">
-				{renderSquare(0)}
-				{renderSquare(1)}
-				{renderSquare(2)}
-			</div>
-			<div className="board-row">
-				{renderSquare(3)}
-				{renderSquare(4)}
-				{renderSquare(5)}
-			</div>
-			<div className="board-row">
-				{renderSquare(6)}
-				{renderSquare(7)}
-				{renderSquare(8)}
-			</div>
+			{rows.map((currRow, index) => {
+				return (<div className="board-row">
+					{currRow.map((currSquare) => {
+						return currSquare;
+					})}
+				</div>);
+			})}
 		</div>
 	);
+
+	// return (
+	// 	<div>
+	// 		<div className="board-row">
+	// 			{renderSquare(0)}
+	// 			{renderSquare(1)}
+	// 			{renderSquare(2)}
+	// 		</div>
+	// 		<div className="board-row">
+	// 			{renderSquare(3)}
+	// 			{renderSquare(4)}
+	// 			{renderSquare(5)}
+	// 		</div>
+	// 		<div className="board-row">
+	// 			{renderSquare(6)}
+	// 			{renderSquare(7)}
+	// 			{renderSquare(8)}
+	// 		</div>
+	// 	</div>
+	// );
+
+
 }
 
 function Status(props) {
