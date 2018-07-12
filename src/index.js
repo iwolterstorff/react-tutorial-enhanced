@@ -35,7 +35,7 @@ function Board(props) {
 
 	return (
 		<div>
-			{rows.map((currRow, index) => {
+			{rows.map((currRow) => {
 				return (<div className="board-row">
 					{currRow.map((currSquare) => {
 						return currSquare;
@@ -44,27 +44,6 @@ function Board(props) {
 			})}
 		</div>
 	);
-
-	// return (
-	// 	<div>
-	// 		<div className="board-row">
-	// 			{renderSquare(0)}
-	// 			{renderSquare(1)}
-	// 			{renderSquare(2)}
-	// 		</div>
-	// 		<div className="board-row">
-	// 			{renderSquare(3)}
-	// 			{renderSquare(4)}
-	// 			{renderSquare(5)}
-	// 		</div>
-	// 		<div className="board-row">
-	// 			{renderSquare(6)}
-	// 			{renderSquare(7)}
-	// 			{renderSquare(8)}
-	// 		</div>
-	// 	</div>
-	// );
-
 
 }
 
@@ -85,7 +64,7 @@ function Status(props) {
 
 function MoveList(props) {
 
-	return (<ol>{props.history.map((thisMove, thisMoveIndex) => {
+	let componentList = props.history.map((thisMove, thisMoveIndex) => {
 		let newMove = {};
 		try {
 			newMove = findNewMove(props.history[thisMoveIndex - 1].squares, thisMove.squares);
@@ -105,7 +84,22 @@ function MoveList(props) {
 				<button onClick={() => props.jumpTo(thisMoveIndex)}>{desc}</button>
 			</li>
 		);
-	})}</ol>);
+	})
+
+	if (props.newestFirst) {
+		componentList = componentList.slice().reverse();
+	}
+
+	return (<React.Fragment>
+		<ToggleButton newestFirst={props.newestFirst} toggleOrder={props.toggleOrder} />
+		<ol reversed={props.newestFirst}>{componentList}</ol>
+		</React.Fragment>);
+}
+
+function ToggleButton(props) {
+	const text = props.newestFirst ? '\u25b2 Newest' : '\u25bc Oldest';
+
+	return (<button onClick={() => props.toggleOrder()}>{text}</button>);
 }
 
 class Game extends React.Component {
@@ -119,6 +113,7 @@ class Game extends React.Component {
 			}],
 			stepNumber: 0,
 			xIsNext: true,
+			newestFirst: false,
 		};
 	}
 
@@ -136,7 +131,13 @@ class Game extends React.Component {
 					</div>
 					<div className="game-info">
 						<Status winner={calculateWinner(current.squares)} xIsNext={this.state.xIsNext} />
-						<MoveList history={history} jumpTo={move => this.jumpTo(move)} />
+						<div className="move-list">
+							<MoveList
+								history={history}
+								jumpTo={move => this.jumpTo(move)}
+								newestFirst={this.state.newestFirst}
+								toggleOrder={() => this.setState({newestFirst: !this.state.newestFirst})} />
+						</div>
 					</div>
 				</div>
 		);
